@@ -1,8 +1,8 @@
-use std::mem::size_of;
 use std::ptr::NonNull;
+use std::mem::size_of;
 
 use crate::constants;
-use crate::rawptr::RawPtr;
+use crate::raw_ptr::RawPtr;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum AllocError {
@@ -39,7 +39,7 @@ pub trait AllocRaw {
 
     fn alloc<T>(&self, object: T) -> Result<RawPtr<T>, AllocError>
     where
-        T: AllocObject<<Self::Header>::TypeId>;
+        T: AllocObject<<Self::Header as AllocHeader>::TypeId>;
 
     fn alloc_array(&self, size_bytes: ArraySize) -> Result<RawPtr<u8>, AllocError>;
 
@@ -77,3 +77,14 @@ pub enum Mark {
     Marked,
 }
 
+/// Return the allocated size of an object as it's size_of::<T>() value rounded
+/// up to a double-word boundary
+///
+/// TODO this isn't correctly implemented, as aligning the object to a double-word
+/// boundary while considering header size (which is not known to this libarary
+/// until compile time) means touching numerous bump-allocation code points with
+/// some math and bitwise ops I haven't worked out yet
+pub fn alloc_size_of(object_size: usize) -> usize {
+    let align = size_of::<usize>(); // * 2;
+    (object_size + (align - 1)) & !(align - 1)
+}
