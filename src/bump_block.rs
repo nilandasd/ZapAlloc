@@ -1,15 +1,26 @@
 use crate::block::{BlockError, Block};
+use crate::allocator::AllocError;
 use crate::constants;
+
 use std::ptr::write;
 
-struct BumpBlock {
+impl From<BlockError> for AllocError {
+    fn from(error: BlockError) -> AllocError {
+        match error {
+            BlockError::BadRequest => AllocError::BadRequest,
+            BlockError::OOM => AllocError::OOM,
+        }
+    }
+}
+
+pub struct BumpBlock {
     block: Block,
     cursor: *const u8,
     limit: *const u8
 }
 
 impl BumpBlock {
-    fn new() -> Result<BumpBlock, BlockError> {
+    pub fn new() -> Result<BumpBlock, AllocError> {
         let block = Block::new(constants::BLOCK_SIZE)?;
         let limit = block.as_ptr();
         let cursor = unsafe { limit.add(constants::BLOCK_CAPACITY) };
