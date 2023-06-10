@@ -1,0 +1,25 @@
+notes
+
+1. make a block allocator
+  - blocks are always a power of 2
+
+
+2. Defined a bump block
+
+3. Define an allocator object trait
+  - should be able to make an allocation header from the
+    object
+
+  - an allocator object should define the allocator header trait
+
+  - Header should define...
+      - object is marked?
+      - object size
+      - object is pointer? 
+      - object pointer
+
+
+
+Header:
+  Array?
+  u8
