@@ -5,6 +5,10 @@ mod heap;
 mod raw_ptr;
 mod allocator;
 
+pub use crate::block::{
+    BlockError
+};
+
 pub use crate::allocator::{
     AllocError, AllocHeader, AllocObject, AllocRaw, AllocTypeId, ArraySize, Mark, SizeClass,
 };
