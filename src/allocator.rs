@@ -20,17 +20,11 @@ pub trait AllocHeader: Sized {
     type TypeId: AllocTypeId;
 
     fn new<O: AllocObject<Self::TypeId>>(size: u32, size_class: SizeClass, mark: Mark) -> Self;
-
     fn new_array(size: ArraySize, size_class: SizeClass, mark: Mark) -> Self;
-
     fn mark(&mut self);
-
     fn is_marked(&self) -> bool;
-
     fn size_class(&self) -> SizeClass;
-
     fn size(&self) -> u32;
-
     fn type_id(&self) -> Self::TypeId;
 }
 
@@ -40,11 +34,8 @@ pub trait AllocRaw {
     fn alloc<T>(&self, object: T) -> Result<RawPtr<T>, AllocError>
     where
         T: AllocObject<<Self::Header as AllocHeader>::TypeId>;
-
     fn alloc_array(&self, size_bytes: ArraySize) -> Result<RawPtr<u8>, AllocError>;
-
     fn get_header(object: NonNull<()>) -> NonNull<Self::Header>;
-
     fn get_object(header: NonNull<Self::Header>) -> NonNull<()>;
 }
 
@@ -77,14 +68,10 @@ pub enum Mark {
     Marked,
 }
 
-/// Return the allocated size of an object as it's size_of::<T>() value rounded
-/// up to a double-word boundary
-///
-/// TODO this isn't correctly implemented, as aligning the object to a double-word
-/// boundary while considering header size (which is not known to this libarary
-/// until compile time) means touching numerous bump-allocation code points with
-/// some math and bitwise ops I haven't worked out yet
-pub fn alloc_size_of(object_size: usize) -> usize {
-    let align = size_of::<usize>(); // * 2;
-    (object_size + (align - 1)) & !(align - 1)
+pub fn add_alignment_padding(object_size: usize) -> usize {
+    let align = size_of::<usize>();
+
+    if (object_size % align) == 0 { return object_size; }
+
+    object_size + (align - (object_size % align))
 }

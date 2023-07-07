@@ -24,8 +24,11 @@ impl BumpBlock {
         let block = Block::new(constants::BLOCK_SIZE)?;
         let limit = block.as_ptr();
         let cursor = unsafe { limit.add(constants::BLOCK_CAPACITY) };
+        let mut bump_block = BumpBlock { block, cursor, limit};
 
-        Ok(BumpBlock { block, cursor, limit})
+        bump_block.reset();
+
+        Ok(bump_block)
     }
 
     pub fn inner_alloc(&mut self, alloc_size: usize) -> Option<*const u8> {
@@ -112,11 +115,9 @@ impl BumpBlock {
         self.cursor = unsafe { self.limit.add(constants::BLOCK_CAPACITY) };
 
         unsafe {
-            let mut meta_ptr = self.block.as_ptr().add(constants::META_OFFSET) as *mut u8;
-
-            for _ in 0..128 {
-                *meta_ptr = constants::FREE;
-                 meta_ptr = self.block.as_ptr().add(1) as *mut u8;
+            for i in 0..128 {
+                 *(self.block.as_ptr().add(constants::META_OFFSET + i) as *mut u8)
+                     = constants::FREE;
             }
         }
     }
