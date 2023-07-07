@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "zap-init"
-version = "0.1.0"
+name = "zapalloc"
+version = "0.0.1"

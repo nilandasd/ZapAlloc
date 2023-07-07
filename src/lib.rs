@@ -1,6 +1,6 @@
 mod block;
 mod constants;
 mod bump_block;
-mod allocator;
-mod raw_ptr;
 mod heap;
+pub mod raw_ptr;
+pub mod allocator;
