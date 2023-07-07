@@ -2,5 +2,13 @@ mod block;
 mod constants;
 mod bump_block;
 mod heap;
-pub mod raw_ptr;
-pub mod allocator;
+mod raw_ptr;
+mod allocator;
+
+pub use crate::allocator::{
+    AllocError, AllocHeader, AllocObject, AllocRaw, AllocTypeId, ArraySize, Mark, SizeClass,
+};
+
+pub use crate::heap::ZapHeap;
+
+pub use crate::raw_ptr::RawPtr;
